@@ -1,15 +1,13 @@
+import { buildChallenge as _buildChallenge } from './challenge'
+
 const buildGame = () => {
   return {
     challenges: []
   }
 }
 
-const buildChallenge = state => (player_ids, questions_limit = 42) => {
-  const c = {
-    player_ids,
-    questions_limit,
-    questions: []
-  }
+const buildChallenge = state => (player_ids, questions_limit) => {
+  const c = _buildChallenge(player_ids, questions_limit)
   state.challenges.push(c)
   return c
 }

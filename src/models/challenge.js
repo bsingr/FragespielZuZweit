@@ -1,3 +1,12 @@
+const buildChallenge = (player_ids, questions_limit = 42) => {
+  const c = {
+    player_ids,
+    questions_limit,
+    questions: []
+  }
+  return c
+}
+
 const findChallengeQuestion = challenge => questionText => {
   const question = challenge.questions.find(q => q.question === questionText)
   if (!question) throw new Error(`No question "${questionText}"`)
@@ -26,6 +35,20 @@ const buildChallengeQuestionAnswer = challenge => questionText => answer_player_
   question.actual_answers.push({
     player_id: answer_player_id,
     answer: answerText
+  })
+}
+
+const syncChallenge = (challengeA, challengeB) => {
+  challengeA.questions.forEach(question => {
+    const bQuestion = challengeB.questions.find(q => q.question === question.question)
+    const additionalAnswersFromB = []
+    bQuestion.actual_answers.forEach(answer => {
+      const aAnswer = question.actual_answers.find(a => a.player_id === answer.player_id)
+      if (!aAnswer) {
+        additionalAnswersFromB.push(answer)
+      }
+    })
+    question.actual_answers = question.actual_answers.concat(additionalAnswersFromB)
   })
 }
 
@@ -66,10 +89,12 @@ const buildChallengeStats = challenge => {
 }
 
 export {
+  buildChallenge,
   buildChallengeStats,
   findChallengeQuestion,
   buildChallengeQuestion,
   buildChallengeQuestionAnswer,
+  syncChallenge,
   isQuestionAnswered,
   isQuestionCorrectlyAnswered
 }

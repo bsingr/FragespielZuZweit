@@ -1,16 +1,27 @@
-function create (me) {
-  fetch(`http://httprelay.io/link/${amount}`, {
-    method: 'GET'
+const buildId = (player_ids) => btoa(player_ids.sort((a,b) => a.localeCompare(b)).join())
+const buildUrl = (id) => `http://httprelay.io/mcast/${id}`
+
+function postChallenge(challenge) {
+  return fetch(buildUrl(buildId(challenge.player_ids)), {
+    method: 'POST',
+    body: JSON.stringify(challenge)
   })
-  .then(res => res.json())
+  .then(res => res.text())
 }
 
-function get (me, other) {
-  fetch(`http://httprelay.io/link/${me}`, {
-    method: 'GET'
+function getChallenge(player_ids) {
+  return new Promise((resolve, reject) => {
+    fetch(buildUrl(buildId(player_ids)), {
+      method: 'GET'
+    })
+    .then(res => resolve(res.json()))
+    setTimeout(() => {
+      resolve(undefined)
+    }, 500)
   })
-  .then(res => res.json())
 }
 
-export create
-export get
+export {
+  getChallenge,
+  postChallenge
+}
