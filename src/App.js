@@ -35,16 +35,9 @@ function ChallengeQuestion({question, incorrect_answers, correct_answer, handleC
 }
 
 function Challenge({my_player_id, player_ids, questions, handleCreateQuestionAnswer}) {
-  const stats = buildChallengeStats({player_ids, questions})
-  const myStats = stats.per_player.find(s => s.player_id === my_player_id)
   return (
     <div className="Challenge">
       <h2>{player_ids.join(' vs. ')}</h2>
-      <ul>
-        <li>Best player(s): {stats.best_player_ids.join(', ')}</li>
-        <li>Correct answers: {myStats.correct_answers}</li>
-        <li>Incorrect answers: {myStats.incorrect_answers}</li>
-      </ul>
       {questions.map(question => (
         <ChallengeQuestion
           key={question.question}
@@ -58,44 +51,103 @@ function Challenge({my_player_id, player_ids, questions, handleCreateQuestionAns
   )
 }
 
+function ChallengeStats({my_player_id, player_ids, questions}) {
+  const stats = buildChallengeStats({player_ids, questions})
+  const myStats = stats.per_player.find(s => s.player_id === my_player_id)
+  return (
+    <ul>
+      <li>Best player(s): {stats.best_player_ids.join(', ')}</li>
+      <li>Correct answers: {myStats.correct_answers}</li>
+      <li>Incorrect answers: {myStats.incorrect_answers}</li>
+    </ul>
+  )
+}
+
+function makeId(length) {
+   var result           = '';
+   var characters       = 'ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz0123456789';
+   var charactersLength = characters.length;
+   for ( var i = 0; i < length; i++ ) {
+      result += characters.charAt(Math.floor(Math.random() * charactersLength));
+   }
+   return result;
+}
+
 function App() {
   const [game, setGame] = useState({});
-
-  const my_player_id = 'greg'
+  const [myPlayerId, setMyPlayerId] = useState(makeId(10))
+  const [opponentPlayerId, setOpponentPlayerId] = useState(makeId(10))
 
   useEffect(() => {
     loadGame().then(state => {
-      console.log(state)
       setGame(state)
     })
   }, []);
 
   const handleCreateChallenge = useCallback(() => {
     loadGame().then(state => {
-      const challenge = createChallenge(state)(['greg', 'mike'])
+      const challenge = createChallenge(state)([myPlayerId, opponentPlayerId])
       createQuestions(challenge).then(() => {
-        saveGame(state)
+        // saveGame(state)
         setGame(Object.assign({}, state))
-        console.log(state)
       })
     })
   }, []);
+
+  const handleChangeMyPlayerId = (e) => {
+    setMyPlayerId(e.target.value)
+  }
+
+  const handleChangeOpponentPlayerId = (e) => {
+    setOpponentPlayerId(e.target.value)
+  }
 
   const reload = () => {
     setGame(Object.assign({}, game))
   }
 
+  const [currentChallenge, setCurrentChallenge] = useState(undefined);
+  const handleStartChallenge = (challenge) => {
+    setCurrentChallenge(challenge)
+  }
+  const handleStopChallenge = () => {
+    setCurrentChallenge(undefined)
+  }
+
+  let challenges;
+  if (currentChallenge) {
+    challenges = (
+      <div>
+        <a onClick={handleStopChallenge}>Stop</a>
+        <ChallengeStats my_player_id={myPlayerId} {...currentChallenge} />
+        <Challenge
+            key={currentChallenge.player_ids.join('-')}
+            my_player_id={myPlayerId}
+            handleCreateQuestionAnswer={createQuestionAnswer(reload)(currentChallenge)}
+            {...currentChallenge}
+            />
+      </div>
+    )
+  } else {
+    challenges = (
+      <ul>
+      {(game.challenges || []).map(challenge => (
+        <li key={challenge.player_ids.join('-')} onClick={() => handleStartChallenge(challenge)}>
+          {challenge.player_ids.join(' vs. ')}
+          <ChallengeStats my_player_id={myPlayerId} {...challenge} />
+        </li>
+      ))}
+      </ul>
+    )
+  }
+
   return (
     <div className="App">
+      Me <input value={myPlayerId} onChange={handleChangeMyPlayerId} />
+      vs. 
+      Opponent <input value={opponentPlayerId} onChange={handleChangeOpponentPlayerId} />
       <a onClick={handleCreateChallenge}>Create Challenge</a>
-      {(game.challenges || []).map(challenge => (
-        <Challenge
-          key={challenge.player_ids.join('-')}
-          my_player_id={my_player_id}
-          handleCreateQuestionAnswer={createQuestionAnswer(reload)(challenge)}
-          {...challenge}
-          />
-      ))}
+      {challenges}
     </div>
   );
 }
