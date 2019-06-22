@@ -3,7 +3,7 @@ import logo from './logo.svg';
 import './App.css';
 import { loadGame, saveGame, createChallenge } from './actions/game'
 import { createQuestions, createQuestionAnswer } from './actions/challenge'
-import { isQuestionAnswered, isQuestionCorrectlyAnswered } from './models/challenge'
+import { isQuestionAnswered, isQuestionCorrectlyAnswered, buildChallengeStats } from './models/challenge'
 
 function shuffle(a) {
   var j, x, i;
@@ -35,9 +35,16 @@ function ChallengeQuestion({question, incorrect_answers, correct_answer, handleC
 }
 
 function Challenge({my_player_id, player_ids, questions, handleCreateQuestionAnswer}) {
+  const stats = buildChallengeStats({player_ids, questions})
+  const myStats = stats.per_player.find(s => s.player_id === my_player_id)
   return (
     <div className="Challenge">
       <h2>{player_ids.join(' vs. ')}</h2>
+      <ul>
+        <li>Best player(s): {stats.best_player_ids.join(', ')}</li>
+        <li>Correct answers: {myStats.correct_answers}</li>
+        <li>Incorrect answers: {myStats.incorrect_answers}</li>
+      </ul>
       {questions.map(question => (
         <ChallengeQuestion
           key={question.question}

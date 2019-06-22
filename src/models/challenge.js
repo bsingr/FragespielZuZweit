@@ -30,18 +30,16 @@ const buildChallengeQuestionAnswer = challenge => questionText => answer_player_
 }
 
 const buildChallengeStats = challenge => {
-  const per_player = []
+  const per_player = challenge.player_ids.map(player_id => {
+    return {
+      player_id,
+      correct_answers: 0,
+      incorrect_answers: 0
+    }
+  })
   challenge.questions.forEach(q => {
     q.actual_answers.forEach(a => {
-      let player_stats = per_player.find(p => p.player_id === a.player_id)
-      if (!player_stats) {
-        player_stats = {
-          player_id: a.player_id,
-          correct_answers: 0,
-          incorrect_answers: 0
-        }
-        per_player.push(player_stats)
-      }
+      const player_stats = per_player.find(p => p.player_id === a.player_id)
       if (q.correct_answer === a.answer) {
         player_stats.correct_answers += 1
       } else {

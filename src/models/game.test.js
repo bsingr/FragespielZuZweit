@@ -71,6 +71,21 @@ describe('game', () => {
 
   it('answers question in challenge until game is finished challenge', () => {
     const challenge = buildChallenge(game)(['greg', 'mike'], 3)
+    expect(buildChallengeStats(findChallenge(game)(['greg', 'mike']))).toEqual({
+      best_player_ids: ['greg', 'mike'],
+      per_player: [
+        {
+          player_id: 'greg',
+          correct_answers: 0,
+          incorrect_answers: 0
+        },
+        {
+          player_id: 'mike',
+          correct_answers: 0,
+          incorrect_answers: 0
+        }
+      ]
+    })
     buildChallengeQuestion(challenge)({
       "category": "Entertainment: Film",
       "type": "multiple",
@@ -166,14 +181,14 @@ describe('game', () => {
       best_player_ids: ['mike'],
       per_player: [
         {
-          player_id: 'mike',
-          correct_answers: 2,
-          incorrect_answers: 1
-        },
-        {
           player_id: 'greg',
           correct_answers: 1,
           incorrect_answers: 2
+        },
+        {
+          player_id: 'mike',
+          correct_answers: 2,
+          incorrect_answers: 1
         }
       ]
     })
