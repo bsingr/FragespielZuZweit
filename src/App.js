@@ -5,16 +5,7 @@ import { loadGame, saveGame, createChallenge, syncChallenge } from './actions/ga
 import { createQuestionAnswer } from './actions/challenge'
 import { isQuestionAnswered, isQuestionCorrectlyAnswered, buildChallengeStats } from './models/challenge'
 
-function shuffle(a) {
-  var j, x, i;
-  for (i = a.length - 1; i > 0; i--) {
-    j = Math.floor(Math.random() * (i + 1));
-    x = a[i];
-    a[i] = a[j];
-    a[j] = x;
-  }
-  return a;
-} 
+import shuffle from './utils/array'
 
 function useInterval(callback, delay) {
   const savedCallback = useRef();
