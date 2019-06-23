@@ -4,28 +4,8 @@ import './App.css';
 import { loadGame, saveGame, createChallenge, syncChallenge } from './actions/game'
 import { createQuestionAnswer } from './actions/challenge'
 import { isQuestionAnswered, isQuestionCorrectlyAnswered, buildChallengeStats } from './models/challenge'
-
 import shuffle from './utils/array'
-
-function useInterval(callback, delay) {
-  const savedCallback = useRef();
-
-  // Remember the latest callback.
-  useEffect(() => {
-    savedCallback.current = callback;
-  }, [callback]);
-
-  // Set up the interval.
-  useEffect(() => {
-    function tick() {
-      savedCallback.current();
-    }
-    if (delay !== null) {
-      let id = setInterval(tick, delay);
-      return () => clearInterval(id);
-    }
-  }, [delay]);
-}
+import {useInterval} from './utils/react-hooks'
 
 function ChallengeQuestion({question, incorrect_answers, correct_answer, handleCreateQuestionAnswer, isAlreadyAnswered, isQuestionCorrectlyAnswered}) {
   const answers = useMemo(() => shuffle(incorrect_answers.concat(correct_answer)), [incorrect_answers, correct_answer]);
