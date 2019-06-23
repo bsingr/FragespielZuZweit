@@ -6,6 +6,8 @@ import { createQuestionAnswer } from './actions/challenge'
 import { isQuestionAnswered, isQuestionCorrectlyAnswered, buildChallengeStats } from './models/challenge'
 import shuffle from './utils/array'
 import {useInterval} from './utils/react-hooks'
+import {getQueryVariable} from './utils/urlQuery'
+import makeId from './utils/makeId'
 
 function ChallengeQuestion({question, incorrect_answers, correct_answer, handleCreateQuestionAnswer, isAlreadyAnswered, isQuestionCorrectlyAnswered}) {
   const answers = useMemo(() => shuffle(incorrect_answers.concat(correct_answer)), [incorrect_answers, correct_answer]);
@@ -57,28 +59,6 @@ function ChallengeStats({my_player_id, player_ids, questions}) {
       <li>Incorrect answers: {myStats.incorrect_answers} vs. {otherStats ? otherStats.incorrect_answers : ''}</li>
     </ul>
   )
-}
-
-function getQueryVariable(variable) {
-    var query = window.location.search.substring(1);
-    var vars = query.split('&');
-    for (var i = 0; i < vars.length; i++) {
-        var pair = vars[i].split('=');
-        if (decodeURIComponent(pair[0]) == variable) {
-            return decodeURIComponent(pair[1]);
-        }
-    }
-    console.log('Query variable %s not found', variable);
-}
-
-function makeId(length) {
-   var result           = '';
-   var characters       = 'ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz0123456789';
-   var charactersLength = characters.length;
-   for ( var i = 0; i < length; i++ ) {
-      result += characters.charAt(Math.floor(Math.random() * charactersLength));
-   }
-   return result;
 }
 
 function App() {
